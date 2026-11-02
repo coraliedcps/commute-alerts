@@ -98,6 +98,21 @@ def hhmm(dt: datetime) -> str:
     return dt.strftime("%H:%M")
 
 
+def _title_status(ev: Event) -> str:
+    s = ev.state
+    return {
+        EventKind.CANCELED: "Supprimé",
+        EventKind.SKIPPED_ORIGIN: "Supprimé",
+        EventKind.SKIPPED_DEST: "Terminus avancé",
+        EventKind.REMOVED: "Supprimé",
+        EventKind.BUS: "Car",
+        EventKind.DELAY: f"Retard +{s.delay_min} min",
+        EventKind.ADDED: "Ajouté",
+        EventKind.RECOVERED: "Rétabli",
+        EventKind.ALERT: "Info",
+    }[ev.kind]
+
+
 def _initial_state(p: PlannedTrain, window: str) -> TrainState:
     return TrainState(
         service_date=p.service_date,
@@ -323,7 +338,11 @@ def build_notification(
         if "warning" not in tags:
             tags.append("warning")
     else:
-        title = f"🚆 {head}"
+        # Une ligne par train dans le titre : « 🚆 Matin 07:28 - Supprimé »
+        title = "\n".join(
+            f"🚆 {window.name} {hhmm(_main_event(evs).state.planned_dep)} - {_title_status(_main_event(evs))}"
+            for evs in sorted(by_train.values(), key=lambda e: e[0].state.planned_dep)
+        )
         # Une même alerte « info » sur plusieurs trains (travaux, affluence…) : une seule ligne
         info_groups: dict[str, list[TrainState]] = {}
         ordered = sorted(by_train.values(), key=lambda e: e[0].state.planned_dep)
