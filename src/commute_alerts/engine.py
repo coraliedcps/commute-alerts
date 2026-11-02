@@ -355,7 +355,7 @@ def build_notification(
             tags.append("warning")
     else:
         parts = [
-            f"{hhmm(_main_event(evs).state.planned_dep)} {_title_status(_main_event(evs))}"
+            f"{hhmm(_main_event(evs).state.planned_dep)} - {_title_status(_main_event(evs))}"
             for evs in sorted(by_train.values(), key=lambda e: e[0].state.planned_dep)
         ]
         title = bold(f"{window.name} {' · '.join(parts)}")
