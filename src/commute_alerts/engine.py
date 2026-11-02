@@ -358,7 +358,7 @@ def build_notification(
             f"{hhmm(_main_event(evs).state.planned_dep)} - {_title_status(_main_event(evs))}"
             for evs in sorted(by_train.values(), key=lambda e: e[0].state.planned_dep)
         ]
-        title = bold(f"{window.name} {' · '.join(parts)}")
+        title = "🚆 " + bold(f"{window.name} {' · '.join(parts)}")
         # Une même alerte « info » sur plusieurs trains (travaux, affluence…) : une seule ligne
         info_groups: dict[str, list[TrainState]] = {}
         ordered = sorted(by_train.values(), key=lambda e: e[0].state.planned_dep)
